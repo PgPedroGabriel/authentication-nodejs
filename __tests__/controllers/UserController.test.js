@@ -4,6 +4,7 @@ import server from '../../src/app';
 
 describe('UserController', () => {
   let userId = null;
+  let token = null;
   it('Creating USER test', () => {
     const payload = {
       email: 'testtestestJEST@levetec.com.br',
@@ -40,6 +41,30 @@ describe('UserController', () => {
       .expect(400);
   });
 
+  it('Incorrect password', () => {
+    return request(server)
+      .post('/user/auth')
+      .send({
+        username: 'testtestestJEST',
+        password: 'xx'
+      })
+      .expect(401);
+  });
+
+  it('TEST User can be authenticated', () => {
+    return request(server)
+      .post('/user/auth')
+      .send({
+        username: 'testtestestJEST',
+        password: '123123123'
+      })
+      .expect(200)
+      .then(response => {
+        expect(response.body.token).not.toBeNull();
+        token = response.body.token;
+      });
+  });
+
   it('TEST User can be found', () => {
     return request(server)
       .get(`/user/${userId}`)
@@ -61,6 +86,7 @@ describe('UserController', () => {
     return request(server)
       .put(`/user/${userId}`)
       .send(payload)
+      .set('Authorization', token)
       .expect(200)
       .then(res => {
         expect(res.body.username).toBe(payload.username);
@@ -70,6 +96,7 @@ describe('UserController', () => {
   it('TEST User created before can be deleted', () => {
     return request(server)
       .delete(`/user/${userId}`)
+      .set('Authorization', token)
       .expect(200);
   });
 

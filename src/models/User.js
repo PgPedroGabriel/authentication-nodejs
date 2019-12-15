@@ -43,6 +43,11 @@ class User extends Model {
 
     return this;
   }
+
+  async verifyPassword(password) {
+    const verified = await bcrypt.compare(password, this.password_hash);
+    return verified;
+  }
 }
 
 export default User;
