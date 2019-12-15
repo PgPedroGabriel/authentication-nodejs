@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import ConfirmationMail from '../services/mail/ConfirmationMail';
 
 class SimpleAuthenticationController {
   static async list(req, res) {
@@ -20,10 +21,21 @@ class SimpleAuthenticationController {
     if (!existUserName) {
       return res.status(401).json();
     }
+
     const verified = await existUserName.verifyPassword(req.body.password);
 
     if (!verified) {
       return res.status(401).json();
+    }
+
+    if (!existUserName.email_confirmation) {
+      return res.status(401).json({
+        error: {
+          message:
+            'Você precisa confirmar o seu cadastro no e-mail que enviamos para sua caixa de entrada, isto está pendente para lhe conceder o acesso.',
+          field: 'email'
+        }
+      });
     }
 
     const token = jwt.sign(
@@ -45,7 +57,10 @@ class SimpleAuthenticationController {
   }
 
   static async create(req, res) {
-    const { id, username, email, name } = await User.create(req.body);
+    const user = await User.create(req.body);
+    const { id, username, email, name } = user;
+
+    ConfirmationMail(email, user.getConfirmationMailUrl(req.baseUrl));
 
     return res.json({
       id,
@@ -54,6 +69,8 @@ class SimpleAuthenticationController {
       name
     });
   }
+
+  static async confirmEmail(req, res) {}
 
   static async read(req, res) {
     const { id } = req.params;

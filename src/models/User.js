@@ -23,6 +23,13 @@ class User extends Model {
           allowNull: false,
           unique: true
         },
+        email_confirmation: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
+        },
+        email_confirmation_token: {
+          type: Sequelize.STRING
+        },
         password: {
           type: Sequelize.VIRTUAL
         },
@@ -35,6 +42,14 @@ class User extends Model {
       }
     );
     this.addHook('beforeSave', async user => {
+      if (!user.id) {
+        // eslint-disable-next-line no-param-reassign
+        user.email_confirmation_token = await bcrypt.hash(
+          `CONFIRMATIONMAIL${user.email}`,
+          8
+        );
+      }
+
       if (user.password) {
         // eslint-disable-next-line no-param-reassign
         user.password_hash = await bcrypt.hash(user.password, 8);
@@ -47,6 +62,12 @@ class User extends Model {
   async verifyPassword(password) {
     const verified = await bcrypt.compare(password, this.password_hash);
     return verified;
+  }
+
+  getConfirmationMailUrl(baseUrl) {
+    console.log(baseUrl);
+
+    return `${baseUrl}/auth/confirm-mail/${this.email_confirmation_token}`;
   }
 }
 

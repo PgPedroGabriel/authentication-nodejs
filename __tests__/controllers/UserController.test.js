@@ -5,6 +5,7 @@ import server from '../../src/app';
 describe('UserController', () => {
   let userId = null;
   let token = null;
+
   it('Creating USER test', () => {
     const payload = {
       email: 'testtestestJEST@levetec.com.br',
@@ -51,6 +52,19 @@ describe('UserController', () => {
       .expect(401);
   });
 
+  it('TEST user cannot be authenticated because no actives username by email', () => {
+    return request(server)
+      .post('/user/auth')
+      .send({
+        username: 'testtestestJEST',
+        password: '123123123'
+      })
+      .expect(401)
+      .then(response => {
+        expect(response.body.error).not.toBeNull();
+      });
+  });
+
   it('TEST User can be authenticated', () => {
     return request(server)
       .post('/user/auth')
@@ -72,6 +86,22 @@ describe('UserController', () => {
       .then(response => {
         expect(response.body.id).toBe(String(userId));
       });
+  });
+
+  it('Test user CANT be edited because we sending a invalid token', () => {
+    const payload = {
+      email: 'changedTESTJESTUSER@gmail.com',
+      name: 'Change Teste user Name',
+      password: '3123131321',
+      passwordConfirm: '23131331231',
+      username: 'CHANGETESTUSERNAME'
+    };
+
+    return request(server)
+      .put(`/user/${userId}`)
+      .send(payload)
+      .set('Authorization', 'x')
+      .expect(401);
   });
 
   it('Test user can be edited', () => {
