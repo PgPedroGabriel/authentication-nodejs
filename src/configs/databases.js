@@ -6,6 +6,7 @@ const relational = {
   database: process.env.DB_DATABASE,
   host: process.env.DB_HOST,
   dialect: process.env.DB_DIALECT,
+  logging: !process.env.RUNNINGTEST,
   define: {
     timestamps: true,
     underscored: true,
