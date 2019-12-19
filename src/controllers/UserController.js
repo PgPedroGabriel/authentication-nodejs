@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import ConfirmationMail from '../services/mail/ConfirmationMail';
@@ -58,19 +59,73 @@ class SimpleAuthenticationController {
 
   static async create(req, res) {
     const user = await User.create(req.body);
-    const { id, username, email, name } = user;
+    const {
+      id,
+      username,
+      email,
+      name,
+      email_confirmation_token,
+      email_confirmation
+    } = user;
 
-    ConfirmationMail(email, user.getConfirmationMailUrl(req.baseUrl));
+    ConfirmationMail(
+      email,
+      user.getConfirmationMailUrl(`${req.protocol}://${req.get('host')}`)
+    );
 
     return res.json({
       id,
       username,
       email,
-      name
+      name,
+      email_confirmation_token,
+      email_confirmation
     });
   }
 
-  static async confirmEmail(req, res) {}
+  static async confirmEmail(req, res) {
+    // eslint-disable-next-line camelcase
+    const { token } = req.params;
+
+    const user = await User.findOne({
+      where: { email_confirmation_token: token }
+    });
+
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    return res.status(200).send({ token: user.email_confirmation_token });
+  }
+
+  static async verifyEmail(req, res) {
+    const { token } = req.params;
+
+    const user = await User.findOne({
+      where: { email_confirmation_token: token }
+    });
+
+    if (!user || user.email_confirmation) {
+      return res.status(404).send();
+    }
+
+    if (user.email_confirmation) {
+      return res.status(401).send('Email já confirmado.');
+    }
+
+    await User.update(
+      {
+        email_confirmation: true
+      },
+      {
+        where: {
+          id: user.id
+        }
+      }
+    );
+
+    return res.status(200).send('Email confirmado com sucesso');
+  }
 
   static async read(req, res) {
     const { id } = req.params;

@@ -10,7 +10,8 @@ const routes = new Router();
 routes.get('/user', UserController.list);
 routes.post('/user', UserCreateValidation, UserController.create);
 routes.post('/user/auth', UserController.auth);
-routes.get('/user/auth/confirm-mail', UserController.confirmEmail);
+routes.get('/user/auth/confirm-mail/:token', UserController.confirmEmail);
+routes.put('/user/auth/verify/:token', UserController.verifyEmail);
 routes.get('/user/:id', UserController.read);
 routes.put(
   '/user/:id',

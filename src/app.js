@@ -10,7 +10,6 @@ class App {
 
     this.middlewares();
     this.routes();
-    this.exceptionHandling();
   }
 
   middlewares() {
@@ -21,12 +20,6 @@ class App {
 
   routes() {
     this.server.use(routes);
-  }
-
-  exceptionHandling() {
-    this.server.use((err, req, res) => {
-      return res.status(500).send({ error: 'Erro interno' });
-    });
   }
 }
 

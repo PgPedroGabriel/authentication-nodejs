@@ -5,6 +5,7 @@ import server from '../../src/app';
 describe('UserController', () => {
   let userId = null;
   let token = null;
+  let confirmationMailToken = null;
 
   it('Creating USER test', () => {
     const payload = {
@@ -22,7 +23,10 @@ describe('UserController', () => {
       .expect(200)
       .then(response => {
         expect(response.body.id).not.toBeNull();
+        expect(response.body.email_confirmation_token).not.toBeUndefined();
+        expect(response.body.email_confirmation).not.toBeTruthy();
         userId = response.body.id;
+        confirmationMailToken = response.body.email_confirmation_token;
       });
   });
 
@@ -63,6 +67,23 @@ describe('UserController', () => {
       .then(response => {
         expect(response.body.error).not.toBeNull();
       });
+  });
+
+  it('TEST user can generated TOKEN of validation email with success', () => {
+    return request(server)
+      .get(
+        `/user/auth/confirm-mail/${encodeURIComponent(confirmationMailToken)}`
+      )
+      .expect(200)
+      .then(response => {
+        expect(response.body.token).not.toBeUndefined();
+      });
+  });
+
+  it('TEST user verified email with success', () => {
+    return request(server)
+      .put(`/user/auth/verify/${encodeURIComponent(confirmationMailToken)}`)
+      .expect(200);
   });
 
   it('TEST User can be authenticated', () => {

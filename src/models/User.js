@@ -46,7 +46,7 @@ class User extends Model {
         // eslint-disable-next-line no-param-reassign
         user.email_confirmation_token = await bcrypt.hash(
           `CONFIRMATIONMAIL${user.email}`,
-          8
+          1
         );
       }
 
@@ -65,9 +65,9 @@ class User extends Model {
   }
 
   getConfirmationMailUrl(baseUrl) {
-    console.log(baseUrl);
-
-    return `${baseUrl}/auth/confirm-mail/${this.email_confirmation_token}`;
+    return `${baseUrl}/user/auth/confirm-mail/${encodeURIComponent(
+      this.email_confirmation_token
+    )}`;
   }
 }
 
