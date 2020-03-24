@@ -1,4 +1,5 @@
 import Sequelize, { Model } from 'sequelize';
+import 'dotenv';
 import bcrypt from 'bcryptjs';
 
 class User extends Model {
@@ -6,6 +7,7 @@ class User extends Model {
     super.init(
       {
         id: {
+          // trpcar por UUID devido o uso de microserviços e migrações
           type: Sequelize.INTEGER,
           autoIncrement: true,
           primaryKey: true,
@@ -64,8 +66,12 @@ class User extends Model {
     return verified;
   }
 
-  getConfirmationMailUrl(baseUrl) {
-    return `${baseUrl}/user/auth/confirm-mail/${encodeURIComponent(
+  getConfirmationMailUrl() {
+    // return `${baseUrl}/user/auth/confirm-mail/${encodeURIComponent(
+
+    const host = process.env.HOST_URL || 'http://localhost';
+    const port = process.env.PORT || '3000';
+    return `${host}:${port}/confirm-email/${encodeURIComponent(
       this.email_confirmation_token
     )}`;
   }

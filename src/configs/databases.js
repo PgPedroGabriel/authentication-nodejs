@@ -1,4 +1,4 @@
-import '../bootstrap';
+require('dotenv/config');
 
 const relational = {
   username: process.env.DB_USERNAME,
@@ -14,4 +14,4 @@ const relational = {
   }
 };
 
-export default relational;
+module.exports = relational;

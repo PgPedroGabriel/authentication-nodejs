@@ -68,10 +68,7 @@ class SimpleAuthenticationController {
       email_confirmation
     } = user;
 
-    ConfirmationMail(
-      email,
-      user.getConfirmationMailUrl(`${req.protocol}://${req.get('host')}`)
-    );
+    ConfirmationMail(email, user.getConfirmationMailUrl());
 
     return res.json({
       id,
