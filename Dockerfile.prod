@@ -1,16 +1,19 @@
 FROM node:10-alpine
 
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
+
 WORKDIR /usr/app
-
-COPY ./package.json .
-
-ENV NODE_ENV=production
-
-RUN yarn install
 
 COPY . .
 
+RUN find . -maxdepth 1 -type f ! -regex '.*\(.env\|package.json\)$' -exec rm {} +
+RUN rm -rf node_modules \
+    rm -rf .git
+RUN yarn install --no-cache --frozen-lockfile --production
 RUN yarn run build
+RUN rm -rf src/
+RUN ls -la
 
 EXPOSE 3000
 
