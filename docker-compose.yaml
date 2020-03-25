@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+    auth-microservice:
+      build: .
+      container_name: auth-microservice
+      command: yarn run dev
+      volumes:
+        - .:/usr/app/
+        - /usr/app/node_modules
+      environment:
+        - PORT=3000
+      ports:
+        - "3000:3000"
+      depends_on:
+        - postgress-auth-microservice
+      networks:
+        - auth-microservice-network
+
+
+    postgress-auth-microservice:
+      image: postgres:10.4
+      container_name: postgress-auth-microservice
+      restart: always
+      tty: true
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_DB=authentications
+        - POSTGRES_PASSWORD=docker
+      networks:
+        - auth-microservice-network
+
+networks:
+  auth-microservice-network:
+    driver: bridge

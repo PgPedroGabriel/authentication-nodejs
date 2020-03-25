@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --exec sucrase-node ./src/server.js",
-    "test": "RUNNINGTEST=1 jest"
+    "test": "RUNNINGTEST=1 jest --detectOpenHandles",
+    "build": "sucrase ./src -d ./dist --transforms imports",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -16,20 +18,17 @@
     "nodemailer": "^6.4.2",
     "pg": "^7.14.0",
     "sequelize": "^5.21.3",
+    "sucrase": "^3.10.1",
     "yup": "^0.27.0"
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": [
-      "**/__tests__/**/*.test.js"
-    ],
     "transform": {
       ".(js|jsx|ts|tsx)": "@sucrase/jest-plugin"
     },
     "coveragePathIgnorePatterns": [
       "/node_modules/"
-    ],
-    "verbose": true
+    ]
   },
   "devDependencies": {
     "@sucrase/jest-plugin": "^2.0.0",
@@ -43,7 +42,6 @@
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "sequelize-cli": "^5.5.1",
-    "sucrase": "^3.10.1",
     "supertest": "^4.0.2"
   }
 }

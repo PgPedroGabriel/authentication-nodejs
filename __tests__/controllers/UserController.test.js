@@ -7,7 +7,7 @@ describe('UserController', () => {
   let token = null;
   let confirmationMailToken = null;
 
-  it('Creating USER test', () => {
+  test('Creating USER test', (done) => {
     const payload = {
       email: 'testtestestJEST@levetec.com.br',
       name: 'Pedro Gabriel',
@@ -27,10 +27,11 @@ describe('UserController', () => {
         expect(response.body.email_confirmation).not.toBeTruthy();
         userId = response.body.id;
         confirmationMailToken = response.body.email_confirmation_token;
-      });
+        done();
+      })
   });
 
-  it('User exists validation', () => {
+  test('User exists validation', (done) => {
     const payload = {
       email: 'testtestestJEST@levetec.com.br',
       name: 'Pedro Gabriel',
@@ -43,20 +44,22 @@ describe('UserController', () => {
       .post('/user')
       .send(payload)
       .set('Accept', 'application/json')
-      .expect(400);
+      .expect(400)
+      .then(() => done() );
   });
 
-  it('Incorrect password', () => {
+  test('Incorrect password', (done) => {
     return request(server)
       .post('/user/auth')
       .send({
         username: 'testtestestJEST',
         password: 'xx'
       })
-      .expect(401);
+      .expect(401)
+      .then(() => done() );
   });
 
-  it('TEST user cannot be authenticated because no actives username by email', () => {
+  test('TEST user cannot be authenticated because no actives username by email', (done) => {
     return request(server)
       .post('/user/auth')
       .send({
@@ -66,10 +69,11 @@ describe('UserController', () => {
       .expect(401)
       .then(response => {
         expect(response.body.error).not.toBeNull();
-      });
+        done();
+      })
   });
 
-  it('TEST user can generated TOKEN of validation email with success', () => {
+  test('TEST user can generated TOKEN of validation email wtesth success', (done) => {
     return request(server)
       .get(
         `/user/auth/confirm-mail/${encodeURIComponent(confirmationMailToken)}`
@@ -77,16 +81,18 @@ describe('UserController', () => {
       .expect(200)
       .then(response => {
         expect(response.body.token).not.toBeUndefined();
-      });
+        done();
+      })
   });
 
-  it('TEST user verified email with success', () => {
+  test('TEST user verified email wtesth success', (done) => {
     return request(server)
       .put(`/user/auth/verify/${encodeURIComponent(confirmationMailToken)}`)
-      .expect(200);
+      .expect(200)
+      .then(() => done() );
   });
 
-  it('TEST User can be authenticated', () => {
+  test('TEST User can be authenticated', (done) => {
     return request(server)
       .post('/user/auth')
       .send({
@@ -97,19 +103,21 @@ describe('UserController', () => {
       .then(response => {
         expect(response.body.token).not.toBeNull();
         token = response.body.token;
-      });
+        done();
+      })
   });
 
-  it('TEST User can be found', () => {
+  test('TEST User can be found', (done) => {
     return request(server)
       .get(`/user/${userId}`)
       .expect(200)
       .then(response => {
         expect(response.body.id).toBe(String(userId));
-      });
+        done();
+      })
   });
 
-  it('Test user CANT be edited because we sending a invalid token', () => {
+  test('Test user CANT be authenticated because we sending a invalid token', (done) => {
     const payload = {
       email: 'changedTESTJESTUSER@gmail.com',
       name: 'Change Teste user Name',
@@ -122,10 +130,11 @@ describe('UserController', () => {
       .put(`/user/${userId}`)
       .send(payload)
       .set('Authorization', 'x')
-      .expect(401);
+      .expect(401)
+      .then(() => done() );
   });
 
-  it('Test user can be edited', () => {
+  test('Test user can be authenticated', (done) => {
     const payload = {
       email: 'changedTESTJESTUSER@gmail.com',
       name: 'Change Teste user Name',
@@ -141,19 +150,20 @@ describe('UserController', () => {
       .expect(200)
       .then(res => {
         expect(res.body.username).toBe(payload.username);
+        done();
       });
   });
 
-  it('TEST User created before can be deleted', () => {
+  test('TEST User created before can be deleted', (done) => {
     return request(server)
       .delete(`/user/${userId}`)
       .set('Authorization', token)
-      .expect(200);
+      .expect(200).then(() => done() );
   });
 
-  it('TEST User CANNOT be found', () => {
+  test('TEST User CANNOT be found', (done) => {
     return request(server)
       .get(`/user/${userId}`)
-      .expect(404);
+      .expect(404).then(() => done() );
   });
 });
