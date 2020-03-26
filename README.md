@@ -11,15 +11,17 @@
 
 ### Checks
 
-[ ] make sure that .env file is created
-[ ] make sure if you will use docker
+- [ ] make sure that .env file is created
+- [ ] make sure if you will use docker
 
 ### Using docker
 
 1. To test:
+
 ``` docker-compose -p tests run -p 3000 auth-microservice yarn test ```
 
 2. To build:
+
 ``` docker-compose up --build -d ```
 
 *With docker you not need use npm or yarn install beacause of sharing volumes*
@@ -31,12 +33,14 @@
 3. yarn dev
 
 To build to production
+
 ``` yarn run build ```
 
-and deploy dist file
+the dist folder will be generated
 
 
 To test
+
 ``` yarn test ```
 
 
